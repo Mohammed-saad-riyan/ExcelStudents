@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Sidebar from "@/components/Sidebar";
 import {
   BookOpen,
   AlertCircle,
@@ -51,28 +50,26 @@ export default function ExamsPage() {
   }
 
   return (
-    <>
-      <Sidebar />
-      <div className="ml-64 min-h-screen bg-[#fafbfc]">
-        <div className="px-8 py-6">
-          {/* Header */}
-          <div className="mb-6">
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-              <h1 className="text-display text-2xl text-gray-900 mb-1">Exams & Assessments</h1>
-              <p className="text-sm text-gray-500">Take your online exams and view results</p>
-            </motion.div>
-          </div>
+    <div className="min-h-screen bg-[#fafbfc]">
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* Header */}
+        <div className="mb-6">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Exams & Assessments</h1>
+            <p className="text-sm text-gray-500">Take your online exams and view results</p>
+          </motion.div>
+        </div>
 
-          {exams.length === 0 ? (
-            <div className="card-elevated rounded-xl p-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No exams available</h3>
-              <p className="text-sm text-gray-500">Check back later for new exams and assessments</p>
+        {exams.length === 0 ? (
+          <div className="bg-white border border-gray-100 rounded-xl p-8 sm:p-12 text-center">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 text-gray-400" />
             </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-5">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No exams available</h3>
+            <p className="text-sm text-gray-500">Check back later for new exams and assessments</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
               <AnimatePresence>
                 {exams.map((exam, i) => (
                   <motion.div
@@ -80,7 +77,7 @@ export default function ExamsPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="card-elevated rounded-xl p-6 group hover:shadow-lg transition-all"
+                    className="bg-white border border-gray-100 rounded-xl p-4 sm:p-6 group hover:shadow-lg transition-all"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -128,9 +125,8 @@ export default function ExamsPage() {
                 ))}
               </AnimatePresence>
             </div>
-          )}
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

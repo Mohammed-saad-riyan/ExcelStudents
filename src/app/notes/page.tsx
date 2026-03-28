@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Sidebar from "@/components/Sidebar";
 import { StickyNote, ChevronDown, ChevronUp, FileText } from "lucide-react";
 
 interface Note {
@@ -47,39 +46,37 @@ export default function NotesPage() {
   }
 
   return (
-    <>
-      <Sidebar />
-      <div className="ml-64 min-h-screen bg-[#fafbfc]">
-        <div className="px-8 py-6">
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-            <h1 className="text-display text-2xl text-gray-900 mb-1">Class Notes</h1>
-            <p className="text-sm text-gray-500">Notes and study material from your classes</p>
-          </motion.div>
+    <div className="min-h-screen bg-[#fafbfc]">
+      <div className="p-4 sm:p-6 lg:p-8">
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Class Notes</h1>
+          <p className="text-sm text-gray-500">Notes and study material from your classes</p>
+        </motion.div>
 
-          {notes.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="card-elevated rounded-xl p-12 text-center"
-            >
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <StickyNote className="w-8 h-8 text-gray-400" />
-              </div>
+        {notes.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white border border-gray-100 rounded-xl p-8 sm:p-12 text-center"
+          >
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <StickyNote className="w-7 h-7 sm:w-8 sm:h-8 text-gray-400" />
+            </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No notes available</h3>
               <p className="text-sm text-gray-500">
                 Class notes will appear here once your instructor posts them
               </p>
             </motion.div>
-          ) : (
-            <div className="space-y-3">
-              {notes.map((note, i) => (
-                <motion.div
-                  key={note.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                  className="card-elevated rounded-xl overflow-hidden"
-                >
+        ) : (
+          <div className="space-y-3">
+            {notes.map((note, i) => (
+              <motion.div
+                key={note.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.03 }}
+                className="bg-white border border-gray-100 rounded-xl overflow-hidden"
+              >
                   <button
                     onClick={() => setExpandedNote(expandedNote === note.id ? null : note.id)}
                     className="w-full p-5 flex items-center justify-between text-left hover:bg-gray-50/50 transition-colors"
@@ -129,11 +126,10 @@ export default function NotesPage() {
                     </motion.div>
                   )}
                 </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

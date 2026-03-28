@@ -173,19 +173,19 @@ export default function AdminStudentsPage() {
   if ((session?.user as { role: string })?.role !== "admin") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6 lg:space-y-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-3 mb-1">
-            <Shield className="w-6 h-6 text-[#075aae]" />
-            <h1 className="text-3xl font-bold text-gray-900">Admin Panel</h1>
+            <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-[#075aae]" />
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Admin Panel</h1>
           </div>
-          <p className="text-gray-500">Manage student registrations, accounts, and course enrollments.</p>
+          <p className="text-sm sm:text-base text-gray-500">Manage student registrations, accounts, and course enrollments.</p>
         </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
           {[
             { label: "Total Students", value: counts.total, icon: Users, color: "bg-blue-50 text-[#075aae]" },
             { label: "Pending Approval", value: counts.pending, icon: Clock, color: "bg-amber-50 text-amber-600" },
@@ -208,13 +208,13 @@ export default function AdminStudentsPage() {
         </div>
 
         {/* Filters & Search */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex gap-2 bg-white rounded-xl p-1.5 border border-gray-100">
+        <div className="flex flex-col gap-3 lg:gap-4">
+          <div className="flex gap-1 sm:gap-2 bg-white rounded-xl p-1 sm:p-1.5 border border-gray-100 overflow-x-auto">
             {(["pending", "approved", "all"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all capitalize whitespace-nowrap ${
                   filter === f
                     ? "bg-[#075aae] text-white"
                     : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
@@ -228,7 +228,7 @@ export default function AdminStudentsPage() {
               </button>
             ))}
           </div>
-          <div className="relative flex-1">
+          <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"

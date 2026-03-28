@@ -16,6 +16,7 @@ export default function Footer() {
                 alt="Excel Academy"
                 width={120}
                 height={35}
+                style={{ height: 'auto' }}
                 className="object-contain"
               />
             </div>

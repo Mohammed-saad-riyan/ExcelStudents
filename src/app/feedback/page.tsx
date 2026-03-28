@@ -85,8 +85,8 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6 lg:space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -94,8 +94,8 @@ export default function FeedbackPage() {
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
         >
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Student Feedback</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Student Feedback</h1>
+            <p className="text-sm sm:text-base text-gray-500 mt-1">
               See what our students are saying about their experience.
             </p>
           </div>
@@ -212,7 +212,7 @@ export default function FeedbackPage() {
 
         {/* Stats */}
         {feedbacks.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             <div className="bg-white rounded-xl p-4 border border-gray-100 text-center">
               <div className="text-2xl font-bold text-gray-900">{feedbacks.length}</div>
               <div className="text-sm text-gray-500">Total Reviews</div>
@@ -249,13 +249,13 @@ export default function FeedbackPage() {
 
         {/* Feedback List */}
         {feedbacks.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
-            <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <div className="bg-white rounded-2xl p-8 sm:p-12 text-center border border-gray-100">
+            <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900">No feedback yet</h3>
             <p className="text-gray-500 mt-1">Be the first to share your experience!</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
             {feedbacks.map((feedback, i) => (
               <motion.div
                 key={feedback.id}

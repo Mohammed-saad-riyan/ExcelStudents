@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,6 +17,8 @@ import {
   LogOut,
   ChevronRight,
   User,
+  Menu,
+  X,
 } from "lucide-react";
 
 const studentLinks = [
@@ -40,6 +43,24 @@ const adminLinks = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileOpen]);
 
   if (!session) return null;
 
@@ -47,8 +68,8 @@ export default function Sidebar() {
   const isAdmin = userRole === "admin";
   const links = isAdmin ? adminLinks : studentLinks;
 
-  return (
-    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white sidebar-depth z-40 flex flex-col overflow-hidden">
+  const SidebarContent = () => (
+    <>
       {/* Logo */}
       <div className="p-4 border-b border-gray-100">
         <Link href={isAdmin ? "/admin" : "/dashboard"} className="flex items-center gap-2">
@@ -57,6 +78,7 @@ export default function Sidebar() {
             alt="Excel Academy"
             width={140}
             height={40}
+            style={{ height: 'auto' }}
             className="object-contain"
           />
         </Link>
@@ -100,15 +122,11 @@ export default function Sidebar() {
                   }
                 `}
               >
-                {/* Active indicator */}
                 {isActive && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#075aae] rounded-r-full" />
                 )}
-
                 <Icon className={`w-5 h-5 transition-transform ${isActive ? "scale-110" : "group-hover:scale-105"}`} />
                 <span>{link.label}</span>
-
-                {/* Hover arrow */}
                 <ChevronRight
                   className={`ml-auto w-4 h-4 opacity-0 -translate-x-2 transition-all duration-200 ${
                     !isActive && "group-hover:opacity-100 group-hover:translate-x-0"
@@ -138,6 +156,54 @@ export default function Sidebar() {
           <span>Sign Out</span>
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 z-50 flex items-center justify-between px-4">
+        <Link href={isAdmin ? "/admin" : "/dashboard"}>
+          <Image
+            src="/logo.jpg"
+            alt="Excel Academy"
+            width={120}
+            height={35}
+            style={{ height: 'auto' }}
+            className="object-contain"
+          />
+        </Link>
+        <button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          {isMobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <aside
+        className={`
+          lg:hidden fixed top-16 left-0 bottom-0 w-72 bg-white z-40 flex flex-col overflow-hidden
+          transform transition-transform duration-300 ease-in-out
+          ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        <SidebarContent />
+      </aside>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white sidebar-depth z-40 flex-col overflow-hidden">
+        <SidebarContent />
+      </aside>
+    </>
   );
 }

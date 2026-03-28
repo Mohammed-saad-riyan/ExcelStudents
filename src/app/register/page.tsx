@@ -112,6 +112,7 @@ export default function RegisterPage() {
                 alt="Excel Academy"
                 width={150}
                 height={42}
+                style={{ height: 'auto' }}
                 className="object-contain"
               />
             </div>

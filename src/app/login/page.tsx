@@ -58,6 +58,7 @@ export default function LoginPage() {
                 alt="Excel Academy"
                 width={160}
                 height={45}
+                style={{ height: 'auto' }}
                 className="object-contain"
               />
             </div>
@@ -108,6 +109,7 @@ export default function LoginPage() {
               alt="Excel Academy"
               width={150}
               height={42}
+              style={{ height: 'auto' }}
               className="object-contain"
             />
           </div>

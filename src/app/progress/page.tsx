@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Sidebar from "@/components/Sidebar";
 import {
   BarChart3,
   BookOpen,
@@ -102,47 +101,46 @@ export default function ProgressPage() {
   ];
 
   return (
-    <>
-      <Sidebar />
-      <div className="ml-64 min-h-screen bg-[#fafbfc]">
-        <div className="px-8 py-6">
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-            <h1 className="text-display text-2xl text-gray-900 mb-1">My Progress</h1>
-            <p className="text-sm text-gray-500">Track your learning journey and achievements</p>
-          </motion.div>
+    <div className="min-h-screen bg-[#fafbfc]">
+      <div className="p-4 sm:p-6 lg:p-8">
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">My Progress</h1>
+          <p className="text-sm text-gray-500">Track your learning journey and achievements</p>
+        </motion.div>
 
-          {/* Tabs */}
-          <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1 mb-6">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "bg-[#075aae] text-white"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        {/* Tabs */}
+        <div className="flex items-center gap-1 sm:gap-2 bg-white border border-gray-200 rounded-lg p-1 mb-6 overflow-x-auto">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                activeTab === tab.id
+                  ? "bg-[#075aae] text-white"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="sm:hidden">{tab.label.split(" ")[0]}</span>
+            </button>
+          ))}
+        </div>
 
-        {/* Overview */}
-        {activeTab === "overview" && (
-          <div className="space-y-6">
-            <div className="grid sm:grid-cols-3 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="card-elevated rounded-xl p-6"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold text-gray-900">Attendance</h3>
-                  <Clock className="w-5 h-5 text-blue-500" />
-                </div>
-                <div className="relative w-32 h-32 mx-auto">
+      {/* Overview */}
+      {activeTab === "overview" && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white border border-gray-100 rounded-xl p-4 sm:p-6"
+            >
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Attendance</h3>
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+              </div>
+              <div className="relative w-24 h-24 sm:w-32 sm:h-32 mx-auto">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" strokeWidth="10" />
                     <circle
@@ -151,26 +149,26 @@ export default function ProgressPage() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-gray-900">{attendancePercent}%</span>
-                  </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl font-bold text-gray-900">{attendancePercent}%</span>
                 </div>
-                <p className="text-center text-sm text-gray-500 mt-4">
-                  {progress.attendance.attended}/{progress.attendance.total} classes
-                </p>
-              </motion.div>
+              </div>
+              <p className="text-center text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">
+                {progress.attendance.attended}/{progress.attendance.total} classes
+              </p>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white rounded-2xl p-6 border border-gray-100"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold text-gray-900">Avg Exam Score</h3>
-                  <Award className="w-5 h-5 text-[#075aae]" />
-                </div>
-                <div className="relative w-32 h-32 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white border border-gray-100 rounded-xl p-4 sm:p-6"
+            >
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Avg Exam Score</h3>
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-[#075aae]" />
+              </div>
+              <div className="relative w-24 h-24 sm:w-32 sm:h-32 mx-auto">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" strokeWidth="10" />
                     <circle
@@ -179,26 +177,26 @@ export default function ProgressPage() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-gray-900">{avgExamScore}%</span>
-                  </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl sm:text-2xl font-bold text-gray-900">{avgExamScore}%</span>
                 </div>
-                <p className="text-center text-sm text-gray-500 mt-4">
-                  {progress.exams.passed}/{progress.exams.totalAttempts} exams passed
-                </p>
-              </motion.div>
+              </div>
+              <p className="text-center text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">
+                {progress.exams.passed}/{progress.exams.totalAttempts} exams passed
+              </p>
+            </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-2xl p-6 border border-gray-100"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold text-gray-900">Assignments</h3>
-                  <Target className="w-5 h-5 text-purple-500" />
-                </div>
-                <div className="relative w-32 h-32 mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white border border-gray-100 rounded-xl p-4 sm:p-6"
+            >
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Assignments</h3>
+                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+              </div>
+              <div className="relative w-24 h-24 sm:w-32 sm:h-32 mx-auto">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" strokeWidth="10" />
                     <circle
@@ -207,22 +205,22 @@ export default function ProgressPage() {
                       strokeLinecap="round"
                     />
                   </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-gray-900">{assignmentPercent}%</span>
-                  </div>
-                </div>
-                <p className="text-center text-sm text-gray-500 mt-4">
-                  {progress.assignments.submitted}/{progress.assignments.total} submitted
-                </p>
-              </motion.div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl sm:text-2xl font-bold text-gray-900">{assignmentPercent}%</span>
+              </div>
             </div>
+            <p className="text-center text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">
+              {progress.assignments.submitted}/{progress.assignments.total} submitted
+            </p>
+          </motion.div>
+        </div>
 
-            {/* Overall Performance */}
-            <div className="card-elevated rounded-xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#075aae]" />
-                Performance Summary
-              </h3>
+          {/* Overall Performance */}
+          <div className="bg-white border border-gray-100 rounded-xl p-4 sm:p-6">
+            <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-sm sm:text-base">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#075aae]" />
+              Performance Summary
+            </h3>
               <div className="space-y-4">
                 {[
                   { label: "Class Attendance", value: attendancePercent, color: "bg-blue-500" },
@@ -244,14 +242,14 @@ export default function ProgressPage() {
                     </div>
                   </div>
                 ))}
-              </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Attendance Tab */}
-        {activeTab === "attendance" && (
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      {/* Attendance Tab */}
+      {activeTab === "attendance" && (
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100">
               <h3 className="font-semibold text-gray-900">Class Attendance Record</h3>
               <p className="text-sm text-gray-500 mt-1">
@@ -294,8 +292,8 @@ export default function ProgressPage() {
           </div>
         )}
 
-        {/* Exams Tab */}
-        {activeTab === "exams" && (
+      {/* Exams Tab */}
+      {activeTab === "exams" && (
           <div className="space-y-4">
             {progress.exams.attempts.length === 0 ? (
               <div className="bg-white rounded-2xl p-8 text-center border border-gray-100">
@@ -346,8 +344,8 @@ export default function ProgressPage() {
           </div>
         )}
 
-        {/* Assignments Tab */}
-        {activeTab === "assignments" && (
+      {/* Assignments Tab */}
+      {activeTab === "assignments" && (
           <div className="space-y-4">
             {progress.assignments.submissions.length === 0 ? (
               <div className="bg-white rounded-2xl p-8 text-center border border-gray-100">
@@ -401,9 +399,8 @@ export default function ProgressPage() {
               ))
             )}
           </div>
-          )}
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

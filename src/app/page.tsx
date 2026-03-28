@@ -32,6 +32,7 @@ export default function WelcomePage() {
                 alt="Excel Academy"
                 width={180}
                 height={50}
+                style={{ height: 'auto' }}
                 className="object-contain"
               />
             </div>
@@ -124,6 +125,7 @@ export default function WelcomePage() {
             src="/hero-teachers.png"
             alt="Teachers in training session"
             fill
+            sizes="55vw"
             className="object-cover"
             priority
           />
@@ -161,6 +163,7 @@ export default function WelcomePage() {
           src="/hero-teachers.png"
           alt="Teachers in training session"
           fill
+          sizes="100vw"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />

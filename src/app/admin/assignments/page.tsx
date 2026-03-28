@@ -186,21 +186,21 @@ export default function AdminAssignmentsPage() {
   if ((session?.user as { role?: string })?.role !== "admin") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6 lg:space-y-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <Shield className="w-6 h-6 text-[#075aae]" />
-                <h1 className="text-3xl font-bold text-gray-900">Assignments</h1>
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-[#075aae]" />
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Assignments</h1>
               </div>
-              <p className="text-gray-500">Create assignments and evaluate student submissions.</p>
+              <p className="text-sm sm:text-base text-gray-500">Create assignments and evaluate student submissions.</p>
             </div>
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#075aae] text-white text-sm font-medium rounded-xl hover:bg-[#064a8e] transition-colors shadow-lg shadow-blue-500/20"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#075aae] text-white text-sm font-medium rounded-xl hover:bg-[#064a8e] transition-colors shadow-lg shadow-blue-500/20 w-full sm:w-auto"
             >
               {showAddForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
               {showAddForm ? "Cancel" : "Add Assignment"}
@@ -326,7 +326,7 @@ export default function AdminAssignmentsPage() {
         </AnimatePresence>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
           {[
             { label: "Total Submissions", value: totalSubmissions, icon: FileText, color: "bg-blue-50 text-[#075aae]" },
             { label: "Pending Review", value: pendingCount, icon: Clock, color: "bg-amber-50 text-amber-600" },

@@ -17,14 +17,16 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-1 flex">
-        {showSidebar && <Sidebar />}
-        <main className={`flex-1 ${showSidebar ? "ml-64" : ""}`}>
+      {showSidebar && <Sidebar />}
+      <div className="flex-1 flex flex-col">
+        {/* Main content - adjust for sidebar on desktop and mobile header */}
+        <main className={`flex-1 ${showSidebar ? "lg:ml-64 pt-16 lg:pt-0" : ""}`}>
           {children}
         </main>
-      </div>
-      <div className={showSidebar ? "ml-64" : ""}>
-        <Footer />
+        {/* Footer - adjust for sidebar on desktop */}
+        <div className={showSidebar ? "lg:ml-64" : ""}>
+          <Footer />
+        </div>
       </div>
     </div>
   );

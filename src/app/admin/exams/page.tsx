@@ -139,21 +139,21 @@ export default function AdminExamsPage() {
   if ((session?.user as { role?: string })?.role !== "admin") return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-6 lg:space-y-8">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <Shield className="w-6 h-6 text-[#075aae]" />
-                <h1 className="text-3xl font-bold text-gray-900">Manage Exams</h1>
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-[#075aae]" />
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Manage Exams</h1>
               </div>
-              <p className="text-gray-500">Add exams and quizzes via Google Forms.</p>
+              <p className="text-sm sm:text-base text-gray-500">Add exams and quizzes via Google Forms.</p>
             </div>
             <button
               onClick={() => { setShowForm(true); setEditingExam(null); setForm({ title: "", description: "", courseId: "", formUrl: "" }); }}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#075aae] to-[#0ea5e9] text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+              className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-gradient-to-r from-[#075aae] to-[#0ea5e9] text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all w-full sm:w-auto"
             >
               <Plus className="w-4 h-4" />
               Add Exam

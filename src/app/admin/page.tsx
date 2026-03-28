@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Sidebar from "@/components/Sidebar";
 import {
   Shield,
   Users,
@@ -108,40 +107,38 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <>
-      <Sidebar />
-      <div className="ml-64 min-h-screen bg-[#fafbfc]">
-        <div className="px-8 py-6">
-          {/* Header */}
-          <div className="mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between"
-            >
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#075aae] to-[#0ea5e9] rounded-lg flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-display text-2xl text-gray-900">Admin Dashboard</h1>
-                    <p className="text-sm text-gray-500">Manage students, exams, and content</p>
-                  </div>
+    <div className="min-h-screen bg-[#fafbfc]">
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* Header */}
+        <div className="mb-6 lg:mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          >
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#075aae] to-[#0ea5e9] rounded-lg flex items-center justify-center">
+                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+                  <p className="text-sm text-gray-500">Manage students, exams, and content</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg">
-                <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-xs font-medium text-gray-700">
-                  {new Date().toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
-              </div>
-            </motion.div>
-          </div>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg w-fit">
+              <Calendar className="w-4 h-4 text-gray-500" />
+              <span className="text-xs font-medium text-gray-700">
+                {new Date().toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+          </motion.div>
+        </div>
 
           {/* Pending Alert */}
           {stats && stats.counts.pending > 0 && (
@@ -169,101 +166,100 @@ export default function AdminDashboard() {
             </motion.div>
           )}
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-5 mb-6">
-            {[
-              {
-                label: "Total Students",
-                value: stats?.counts.total || 0,
-                icon: Users,
-                color: "text-[#075aae]",
-                bgColor: "bg-blue-50",
-                change: "+12%",
-                trend: "up"
-              },
-              {
-                label: "Pending Approval",
-                value: stats?.counts.pending || 0,
-                icon: Clock,
-                color: "text-amber-600",
-                bgColor: "bg-amber-50",
-                change: stats?.counts.pending ? `${stats.counts.pending} pending` : "None",
-                trend: "neutral"
-              },
-              {
-                label: "Active Students",
-                value: stats?.counts.approved || 0,
-                icon: UserCheck,
-                color: "text-emerald-600",
-                bgColor: "bg-emerald-50",
-                change: "+8%",
-                trend: "up"
-              },
-            ].map((stat, i) => (
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5 mb-6">
+          {[
+            {
+              label: "Total Students",
+              value: stats?.counts.total || 0,
+              icon: Users,
+              color: "text-[#075aae]",
+              bgColor: "bg-blue-50",
+              change: "+12%",
+              trend: "up"
+            },
+            {
+              label: "Pending Approval",
+              value: stats?.counts.pending || 0,
+              icon: Clock,
+              color: "text-amber-600",
+              bgColor: "bg-amber-50",
+              change: stats?.counts.pending ? `${stats.counts.pending} pending` : "None",
+              trend: "neutral"
+            },
+            {
+              label: "Active Students",
+              value: stats?.counts.approved || 0,
+              icon: UserCheck,
+              color: "text-emerald-600",
+              bgColor: "bg-emerald-50",
+              change: "+8%",
+              trend: "up"
+            },
+          ].map((stat, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.05 }}
+              className="bg-white border border-gray-100 rounded-xl p-4 lg:p-5"
+            >
+              <div className="flex items-start justify-between mb-3 lg:mb-4">
+                <div className={`w-10 h-10 lg:w-11 lg:h-11 ${stat.bgColor} rounded-lg flex items-center justify-center`}>
+                  <stat.icon className={`w-5 h-5 lg:w-6 lg:h-6 ${stat.color}`} />
+                </div>
+                {stat.trend === "up" && (
+                  <div className="flex items-center gap-1 text-emerald-600">
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="text-[10px] font-semibold">{stat.change}</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs font-medium text-gray-500 mb-1">{stat.label}</p>
+              <p className="text-2xl lg:text-3xl font-bold text-gray-900">{stat.value}</p>
+            </motion.div>
+          ))}
+          </div>
+
+        {/* Quick Actions */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Management</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
+            {quickActions.map((action, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 + i * 0.05 }}
-                className="card-elevated rounded-xl p-5"
+                transition={{ delay: 0.25 + i * 0.05 }}
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-11 h-11 ${stat.bgColor} rounded-lg flex items-center justify-center`}>
-                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                  </div>
-                  {stat.trend === "up" && (
-                    <div className="flex items-center gap-1 text-emerald-600">
-                      <TrendingUp className="w-3 h-3" />
-                      <span className="text-[10px] font-semibold">{stat.change}</span>
+                <Link
+                  href={action.href}
+                  className="bg-white border border-gray-100 rounded-xl p-4 lg:p-5 block group hover:shadow-lg transition-all relative overflow-hidden"
+                >
+                  {action.badge && (
+                    <div className="absolute top-2 right-2 lg:top-3 lg:right-3">
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${action.badgeColor}`}>
+                        {action.badge}
+                      </span>
                     </div>
                   )}
-                </div>
-                <p className="text-xs font-medium text-gray-500 mb-1">{stat.label}</p>
-                <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                  <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-lg ${action.color} flex items-center justify-center mb-3 lg:mb-4 group-hover:scale-110 transition-transform`}>
+                    <action.icon className="w-5 h-5 lg:w-6 lg:h-6" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-sm lg:text-base mb-1 group-hover:text-[#075aae] transition-colors">
+                    {action.label}
+                  </h3>
+                  <p className="text-xs text-gray-500 mb-2 lg:mb-3">{action.desc}</p>
+                  <div className="flex items-center gap-1 text-xs font-medium text-[#075aae] opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Manage</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
-
-          {/* Quick Actions */}
-          <div>
-            <h2 className="text-sm font-semibold text-gray-900 mb-4">Management</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {quickActions.map((action, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25 + i * 0.05 }}
-                >
-                  <Link
-                    href={action.href}
-                    className="card-elevated rounded-xl p-5 block group hover:shadow-lg transition-all relative overflow-hidden"
-                  >
-                    {action.badge && (
-                      <div className="absolute top-3 right-3">
-                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${action.badgeColor}`}>
-                          {action.badge}
-                        </span>
-                      </div>
-                    )}
-                    <div className={`w-12 h-12 rounded-lg ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                      <action.icon className="w-6 h-6" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-[#075aae] transition-colors">
-                      {action.label}
-                    </h3>
-                    <p className="text-xs text-gray-500 mb-3">{action.desc}</p>
-                    <div className="flex items-center gap-1 text-xs font-medium text-[#075aae] opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span>Manage</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

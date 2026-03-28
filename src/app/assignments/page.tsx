@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Sidebar from "@/components/Sidebar";
 import {
   FileText,
   Clock,
@@ -15,8 +14,6 @@ import {
   Award,
   ChevronDown,
   ChevronUp,
-  Filter,
-  Search,
 } from "lucide-react";
 
 interface Assignment {
@@ -98,21 +95,19 @@ export default function AssignmentsPage() {
   });
 
   return (
-    <>
-      <Sidebar />
-      <div className="ml-64 min-h-screen bg-[#fafbfc]">
-        <div className="px-8 py-6">
-          {/* Header */}
-          <div className="mb-6">
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-              <h1 className="text-display text-2xl text-gray-900 mb-1">Assignments</h1>
-              <p className="text-sm text-gray-500">View, submit, and track your assignments</p>
-            </motion.div>
-          </div>
+    <div className="min-h-screen bg-[#fafbfc]">
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* Header */}
+        <div className="mb-6">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">Assignments</h1>
+            <p className="text-sm text-gray-500">View, submit, and track your assignments</p>
+          </motion.div>
+        </div>
 
-          {/* Filters */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+          <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1 w-fit">
               {[
                 { value: "all", label: "All" },
                 { value: "pending", label: "Pending" },
@@ -132,16 +127,16 @@ export default function AssignmentsPage() {
               ))}
             </div>
 
-            <div className="flex-1" />
+          <div className="hidden sm:block flex-1" />
 
-            <div className="text-xs text-gray-500">
-              {filteredAssignments.length} assignment{filteredAssignments.length !== 1 ? "s" : ""}
-            </div>
+          <div className="text-xs text-gray-500">
+            {filteredAssignments.length} assignment{filteredAssignments.length !== 1 ? "s" : ""}
           </div>
+        </div>
 
-          {filteredAssignments.length === 0 ? (
-            <div className="card-elevated rounded-xl p-12 text-center">
-              <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+        {filteredAssignments.length === 0 ? (
+          <div className="bg-white border border-gray-100 rounded-xl p-8 sm:p-12 text-center">
+            <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900">
                 {assignments.length === 0 ? "No assignments yet" : "No assignments found"}
               </h3>
@@ -287,9 +282,8 @@ export default function AssignmentsPage() {
               );
             })}
           </div>
-          )}
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
