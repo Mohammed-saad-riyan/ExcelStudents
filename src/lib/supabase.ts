@@ -1,10 +1,13 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || "";
 
 // Server-side client with service key (full access)
-export const supabase = createClient(supabaseUrl, supabaseServiceKey);
+// Only create client if we have the required env vars (prevents build errors)
+export const supabase: SupabaseClient = supabaseUrl && supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : (null as unknown as SupabaseClient);
 
 // Types for database tables
 export interface User {
