@@ -14,12 +14,22 @@ import {
   Send,
   FileText,
   Upload,
+  BookOpen,
+  Filter,
+  AlertCircle,
 } from "lucide-react";
+
+interface Course {
+  id: string;
+  title: string;
+}
 
 interface Note {
   id: string;
   title: string;
   content: string;
+  courseId: string | null;
+  courseName: string | null;
   pdfUrl: string | null;
   pdfName: string | null;
   createdAt: string;
@@ -29,13 +39,16 @@ export default function AdminNotesPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [notes, setNotes] = useState<Note[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingNote, setEditingNote] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [form, setForm] = useState({ title: "", content: "", pdfUrl: "", pdfName: "" });
+  const [uploadError, setUploadError] = useState("");
+  const [form, setForm] = useState({ title: "", content: "", pdfUrl: "", pdfName: "", courseId: "" });
+  const [filterCourse, setFilterCourse] = useState<string>("all");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -55,19 +68,27 @@ export default function AdminNotesPage() {
     const res = await fetch("/api/admin/notes");
     const data = await res.json();
     setNotes(data.notes || []);
+    setCourses(data.courses || []);
     setLoading(false);
   };
 
   const handleUpload = async (file: File) => {
     setUploading(true);
+    setUploadError("");
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
 
-    if (res.ok) {
-      setForm((prev) => ({ ...prev, pdfUrl: data.url, pdfName: data.name }));
+      if (res.ok) {
+        setForm((prev) => ({ ...prev, pdfUrl: data.url, pdfName: data.name }));
+      } else {
+        setUploadError(data.error || "Failed to upload file");
+      }
+    } catch {
+      setUploadError("Failed to upload file. Please try again.");
     }
     setUploading(false);
   };
@@ -80,7 +101,7 @@ export default function AdminNotesPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    setForm({ title: "", content: "", pdfUrl: "", pdfName: "" });
+    setForm({ title: "", content: "", pdfUrl: "", pdfName: "", courseId: "" });
     setShowForm(false);
     setSaving(false);
     fetchNotes();
@@ -95,7 +116,7 @@ export default function AdminNotesPage() {
       body: JSON.stringify({ noteId, ...form }),
     });
     setEditingNote(null);
-    setForm({ title: "", content: "", pdfUrl: "", pdfName: "" });
+    setForm({ title: "", content: "", pdfUrl: "", pdfName: "", courseId: "" });
     setSaving(false);
     fetchNotes();
   };
@@ -108,19 +129,43 @@ export default function AdminNotesPage() {
 
   const startEdit = (note: Note) => {
     setEditingNote(note.id);
-    setForm({ title: note.title, content: note.content, pdfUrl: note.pdfUrl || "", pdfName: note.pdfName || "" });
+    setForm({
+      title: note.title,
+      content: note.content,
+      pdfUrl: note.pdfUrl || "",
+      pdfName: note.pdfName || "",
+      courseId: note.courseId || "",
+    });
     setShowForm(false);
+    setUploadError("");
   };
 
   const cancelForm = () => {
     setShowForm(false);
     setEditingNote(null);
-    setForm({ title: "", content: "", pdfUrl: "", pdfName: "" });
+    setForm({ title: "", content: "", pdfUrl: "", pdfName: "", courseId: "" });
+    setUploadError("");
   };
 
   const removePdf = () => {
     setForm((prev) => ({ ...prev, pdfUrl: "", pdfName: "" }));
   };
+
+  // Filter notes by course
+  const filteredNotes = filterCourse === "all"
+    ? notes
+    : filterCourse === "uncategorized"
+      ? notes.filter((n) => !n.courseId)
+      : notes.filter((n) => n.courseId === filterCourse);
+
+  // Get counts for each course
+  const noteCounts: Record<string, number> = {
+    all: notes.length,
+    uncategorized: notes.filter((n) => !n.courseId).length,
+  };
+  courses.forEach((course) => {
+    noteCounts[course.id] = notes.filter((n) => n.courseId === course.id).length;
+  });
 
   if (status === "loading" || loading) {
     return (
@@ -143,10 +188,10 @@ export default function AdminNotesPage() {
                 <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-[#075aae]" />
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Class Notes</h1>
               </div>
-              <p className="text-sm sm:text-base text-gray-500">Create and manage notes visible to all students.</p>
+              <p className="text-sm sm:text-base text-gray-500">Create and manage notes for different courses.</p>
             </div>
             <button
-              onClick={() => { setShowForm(true); setEditingNote(null); setForm({ title: "", content: "", pdfUrl: "", pdfName: "" }); }}
+              onClick={() => { setShowForm(true); setEditingNote(null); setForm({ title: "", content: "", pdfUrl: "", pdfName: "", courseId: "" }); setUploadError(""); }}
               className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-gradient-to-r from-[#075aae] to-[#0ea5e9] text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all w-full sm:w-auto"
             >
               <Plus className="w-4 h-4" />
@@ -154,6 +199,49 @@ export default function AdminNotesPage() {
             </button>
           </div>
         </motion.div>
+
+        {/* Course Filter */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Filter className="w-4 h-4" />
+            <span className="font-medium">Filter by course:</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setFilterCourse("all")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                filterCourse === "all"
+                  ? "bg-[#075aae] text-white"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              All ({noteCounts.all})
+            </button>
+            {courses.map((course) => (
+              <button
+                key={course.id}
+                onClick={() => setFilterCourse(course.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  filterCourse === course.id
+                    ? "bg-[#075aae] text-white"
+                    : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                {course.title} ({noteCounts[course.id] || 0})
+              </button>
+            ))}
+            <button
+              onClick={() => setFilterCourse("uncategorized")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                filterCourse === "uncategorized"
+                  ? "bg-gray-700 text-white"
+                  : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              Uncategorized ({noteCounts.uncategorized})
+            </button>
+          </div>
+        </div>
 
         {/* Create/Edit Form */}
         <AnimatePresence>
@@ -173,15 +261,35 @@ export default function AdminNotesPage() {
                 </button>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Title</label>
-                <input
-                  type="text"
-                  value={form.title}
-                  onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                  placeholder="e.g. Session 1: Introduction to Child Psychology"
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-                />
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">Title</label>
+                  <input
+                    type="text"
+                    value={form.title}
+                    onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+                    placeholder="e.g. Session 1: Introduction"
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4" />
+                    Course
+                  </label>
+                  <select
+                    value={form.courseId}
+                    onChange={(e) => setForm((prev) => ({ ...prev, courseId: e.target.value }))}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none bg-white"
+                  >
+                    <option value="">Select a course (optional)</option>
+                    {courses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-1">
@@ -198,6 +306,12 @@ export default function AdminNotesPage() {
               {/* PDF Upload */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">PDF Attachment (optional)</label>
+                {uploadError && (
+                  <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 px-3 py-2 rounded-lg">
+                    <AlertCircle className="w-4 h-4" />
+                    {uploadError}
+                  </div>
+                )}
                 {form.pdfUrl ? (
                   <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
                     <FileText className="w-5 h-5 text-[#075aae] shrink-0" />
@@ -217,7 +331,7 @@ export default function AdminNotesPage() {
                     {uploading ? (
                       <div className="flex items-center gap-2 text-gray-500">
                         <div className="w-5 h-5 border-2 border-gray-300 border-t-[#075aae] rounded-full animate-spin" />
-                        <span className="text-sm">Uploading...</span>
+                        <span className="text-sm">Uploading to cloud...</span>
                       </div>
                     ) : (
                       <>
@@ -267,15 +381,21 @@ export default function AdminNotesPage() {
         </AnimatePresence>
 
         {/* Notes List */}
-        {notes.length === 0 ? (
+        {filteredNotes.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
             <StickyNote className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900">No notes yet</h3>
-            <p className="text-gray-500 mt-1">Click &quot;Add Note&quot; to create your first class note.</p>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {filterCourse === "all" ? "No notes yet" : "No notes in this category"}
+            </h3>
+            <p className="text-gray-500 mt-1">
+              {filterCourse === "all"
+                ? 'Click "Add Note" to create your first class note.'
+                : "Try selecting a different course filter."}
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {notes.map((note, i) => (
+            {filteredNotes.map((note, i) => (
               <motion.div
                 key={note.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -285,12 +405,19 @@ export default function AdminNotesPage() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <span className="text-xs text-gray-400">
-                      {new Date(note.createdAt).toLocaleDateString("en-IN", {
-                        year: "numeric", month: "short", day: "numeric",
-                      })}
-                    </span>
-                    <h3 className="text-lg font-semibold text-gray-900 mt-1 mb-2">{note.title}</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs text-gray-400">
+                        {new Date(note.createdAt).toLocaleDateString("en-IN", {
+                          year: "numeric", month: "short", day: "numeric",
+                        })}
+                      </span>
+                      {note.courseName && (
+                        <span className="text-xs px-2 py-0.5 bg-blue-50 text-[#075aae] rounded-full font-medium">
+                          {note.courseName}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{note.title}</h3>
                     <p className="text-sm text-gray-600 whitespace-pre-wrap line-clamp-4">{note.content}</p>
                     {note.pdfUrl && (
                       <a

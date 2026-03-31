@@ -12,17 +12,24 @@ export async function GET() {
 
   const { data: notes, error } = await supabase
     .from("class_notes")
-    .select("*")
+    .select("*, courses(id, title)")
     .order("created_at", { ascending: false });
 
   if (error) {
     return NextResponse.json({ error: "Failed to fetch notes" }, { status: 500 });
   }
 
+  // Fetch all courses for filtering
+  const { data: courses } = await supabase
+    .from("courses")
+    .select("id, title")
+    .order("title", { ascending: true });
+
   // Transform to camelCase
   const transformedNotes = notes?.map((n) => ({
     id: n.id,
     courseId: n.course_id,
+    courseName: n.courses?.title || null,
     title: n.title,
     content: n.content,
     pdfUrl: n.pdf_url,
@@ -31,5 +38,8 @@ export async function GET() {
     updatedAt: n.updated_at,
   }));
 
-  return NextResponse.json({ notes: transformedNotes });
+  return NextResponse.json({
+    notes: transformedNotes,
+    courses: courses || [],
+  });
 }

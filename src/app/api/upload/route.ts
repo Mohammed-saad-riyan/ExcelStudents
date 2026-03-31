@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -28,12 +27,28 @@ export async function POST(request: Request) {
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
   const filename = `${timestamp}-${safeName}`;
-  const uploadPath = path.join(process.cwd(), "public", "uploads", "notes", filename);
+  const filePath = `notes/${filename}`;
 
-  await writeFile(uploadPath, buffer);
+  // Upload to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from("uploads")
+    .upload(filePath, buffer, {
+      contentType: "application/pdf",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    console.error("Upload error:", uploadError);
+    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from("uploads")
+    .getPublicUrl(filePath);
 
   return NextResponse.json({
-    url: `/uploads/notes/${filename}`,
+    url: urlData.publicUrl,
     name: file.name,
   });
 }
