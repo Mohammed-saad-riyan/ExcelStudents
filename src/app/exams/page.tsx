@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
@@ -34,7 +34,7 @@ interface Exam {
   } | null;
 }
 
-export default function ExamsPage() {
+function ExamsContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -292,5 +292,13 @@ export default function ExamsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ExamsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="spinner" /></div>}>
+      <ExamsContent />
+    </Suspense>
   );
 }
