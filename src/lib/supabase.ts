@@ -130,6 +130,60 @@ export interface Feedback {
   created_at: string;
 }
 
+export interface ExamAccess {
+  id: string;
+  exam_id: string;
+  user_id: string;
+  granted_at: string;
+  granted_by: string | null;
+}
+
+// Extended exam attempt with grading
+export interface ExamAttemptExtended extends ExamAttempt {
+  status: 'in_progress' | 'submitted' | 'graded';
+  graded_at: string | null;
+  graded_by: string | null;
+  section_scores: string;
+  feedback: string | null;
+}
+
+// Question types for on-platform exams
+export interface MCQQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  marks: number;
+}
+
+export interface FillBlankQuestion {
+  id: string;
+  question: string;
+  marks: number;
+}
+
+export interface ShortAnswerQuestion {
+  id: string;
+  question: string;
+  marks: number;
+  maxWords?: number;
+}
+
+export interface LongAnswerQuestion {
+  id: string;
+  question: string;
+  marks: number;
+  maxWords?: number;
+}
+
+export interface ExamSection {
+  type: 'mcq' | 'fillBlanks' | 'shortAnswer' | 'longAnswer';
+  title: string;
+  instructions: string;
+  questions: (MCQQuestion | FillBlankQuestion | ShortAnswerQuestion | LongAnswerQuestion)[];
+  totalMarks: number;
+  requiredQuestions?: number; // e.g., "attempt any 5"
+}
+
 // Helper to generate cuid-like IDs
 export function generateId(): string {
   const timestamp = Date.now().toString(36);

@@ -41,6 +41,7 @@ export async function GET() {
     description: e.description,
     courseId: e.course_id,
     type: e.type,
+    examType: e.exam_type || e.type,
     duration: e.duration,
     totalMarks: e.total_marks,
     passingMarks: e.passing_marks,
@@ -70,10 +71,11 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { type, title, description, courseId } = body;
 
-  if (!title || !description || !courseId || !type) {
-    return NextResponse.json({ error: "Title, description, course, and type are required" }, { status: 400 });
+  if (!title || !courseId || !type) {
+    return NextResponse.json({ error: "Title, course, and type are required" }, { status: 400 });
   }
 
+  // Google Form exam (external)
   if (type === "final") {
     const { formUrl } = body;
     const { data: exam, error } = await supabase
@@ -81,14 +83,16 @@ export async function POST(request: Request) {
       .insert({
         id: generateId(),
         type: "final",
+        exam_type: "google_form",
         title,
-        description,
+        description: description || "",
         course_id: courseId,
         form_url: formUrl || null,
         duration: 0,
         total_marks: 0,
         passing_marks: 0,
         questions: "[]",
+        sections: "[]",
       })
       .select()
       .single();
@@ -100,7 +104,43 @@ export async function POST(request: Request) {
     return NextResponse.json({ exam });
   }
 
-  // MCQ exam
+  // On-platform exam with sections
+  if (type === "on_platform") {
+    const { duration, totalMarks, passingMarks, sections, instructions, isActive } = body;
+
+    if (!duration || !sections || !sections.length) {
+      return NextResponse.json({ error: "On-platform exams need duration and sections" }, { status: 400 });
+    }
+
+    const { data: exam, error } = await supabase
+      .from("exams")
+      .insert({
+        id: generateId(),
+        type: "on_platform",
+        exam_type: "on_platform",
+        title,
+        description: description || "",
+        course_id: courseId,
+        duration,
+        total_marks: totalMarks || 0,
+        passing_marks: passingMarks || 0,
+        questions: "[]",
+        sections: JSON.stringify(sections),
+        instructions: instructions || null,
+        is_active: isActive ?? false,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating exam:", error);
+      return NextResponse.json({ error: "Failed to create exam" }, { status: 500 });
+    }
+
+    return NextResponse.json({ exam });
+  }
+
+  // Legacy MCQ exam
   const { duration, totalMarks, passingMarks, questions } = body;
 
   if (!duration || !totalMarks || !passingMarks || !questions || !questions.length) {
@@ -112,8 +152,9 @@ export async function POST(request: Request) {
     .insert({
       id: generateId(),
       type: "mcq",
+      exam_type: "on_platform",
       title,
-      description,
+      description: description || "",
       course_id: courseId,
       duration,
       total_marks: totalMarks,
@@ -136,7 +177,8 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { examId, isActive, formUrl } = await request.json();
+  const body = await request.json();
+  const { examId, isActive, formUrl, title, description, duration, passingMarks, totalMarks, sections, instructions } = body;
 
   if (!examId) {
     return NextResponse.json({ error: "Exam ID required" }, { status: 400 });
@@ -145,6 +187,13 @@ export async function PATCH(request: Request) {
   const data: Record<string, unknown> = {};
   if (isActive !== undefined) data.is_active = isActive;
   if (formUrl !== undefined) data.form_url = formUrl;
+  if (title !== undefined) data.title = title;
+  if (description !== undefined) data.description = description;
+  if (duration !== undefined) data.duration = duration;
+  if (passingMarks !== undefined) data.passing_marks = passingMarks;
+  if (totalMarks !== undefined) data.total_marks = totalMarks;
+  if (sections !== undefined) data.sections = JSON.stringify(sections);
+  if (instructions !== undefined) data.instructions = instructions;
 
   const { data: exam, error } = await supabase
     .from("exams")
