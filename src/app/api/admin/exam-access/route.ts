@@ -53,11 +53,19 @@ export async function GET(request: Request) {
 
   const attemptMap = new Map(attempts?.map(a => [a.user_id, a]) || []);
 
-  // Transform data
+  // Transform data - handle Supabase's foreign key relation typing
+  type UserData = { id: string; name: string; email: string; approved: boolean };
+
   const students = enrolledStudents
-    ?.filter(e => e.users && (e.users as { approved: boolean }).approved)
+    ?.filter(e => {
+      const user = e.users as unknown as UserData | UserData[] | null;
+      if (!user) return false;
+      const userData = Array.isArray(user) ? user[0] : user;
+      return userData?.approved;
+    })
     .map(e => {
-      const user = e.users as { id: string; name: string; email: string };
+      const userRaw = e.users as unknown as UserData | UserData[];
+      const user = Array.isArray(userRaw) ? userRaw[0] : userRaw;
       const attempt = attemptMap.get(user.id);
       return {
         id: user.id,
